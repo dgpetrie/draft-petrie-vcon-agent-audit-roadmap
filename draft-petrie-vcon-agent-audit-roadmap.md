@@ -217,7 +217,7 @@ From [AUDIT-ARCH]:
 ## Out of Scope
 
 * TODO: code provenance
-* TODO: using vCon to make or enforce decisions during the conversation (e.g. allowing or blocking a tool invocation)
+* TODO: using vCon to make or enforce decisions during the conversation (e.g. allowing or blocking a tool invocation), as opposed to recording them
 * TODO: the transport between agents
 
 # Gap Analysis
@@ -303,6 +303,12 @@ TODO: [MCP] based, the first example extension, see draft-petrie-vcon-tool-invoc
 ## Permission and Directive Events
 
 Permission and directive requests occur within tool invocations (e.g. [MCP] elicitation), as well as directly in dialog with an AI agent.
+Before a tool is invoked, the host of the agent decides whether the invocation is allowed.
+The host decides by policy, which may allow the invocation, refuse it or require approval from the person or agent on whose behalf the agent is acting.
+The decision, the policy or Party that made it and the reason are part of the conversation record, even when no person or agent is asked.
+When approval is requested, the request and the response are a conversation between the agent and that person or agent, not with the tool.
+The decision refers to the tool invocation it applies to (see [](#tool-invocation-events)).
+Recording the decision is in scope, making or enforcing it is not (see [](#out-of-scope)).
 
 TODO: more than yes/no, menus of options and other directive input requests.
 TODO: [MCP] elicitation (form and URL modes, accept, decline and cancel) as a model.
