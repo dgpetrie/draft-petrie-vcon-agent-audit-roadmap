@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>vCon for AI Agent Conversations: Requirements, Gaps and Extension Roadmap</title>
+<meta content="Daniel G Petrie" name="author">
+<meta content="
+       AI agents converse with people, other agents and tools.
+There is a growing need to capture these conversations for audit, compliance and review.
+This document sorts the requirements for capturing agent conversations into those that fit vCon, those better met by plain logging and those that need other solutions.
+It then identifies the gaps in vCon and proposes a strawman set of vCon extensions to fill them.
+It is intended as a discussion document. 
+    " name="description">
+<meta content="xml2rfc 3.34.1" name="generator">
+<meta content="vcon" name="keyword">
+<meta content="conversation" name="keyword">
+<meta content="AI agent" name="keyword">
+<meta content="audit" name="keyword">
+<meta content="AUDIT" name="keyword">
+<meta content="agentproto" name="keyword">
+<meta content="MCP" name="keyword">
+<meta content="tool invocation" name="keyword">
+<meta content="draft-petrie-vcon-agent-audit-roadmap-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.34.1
+    Python 3.14.8
+    ConfigArgParse 1.8.0
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.13.4
+    pycountry 24.6.1
+    PyYAML 6.0.3
+    requests 2.33.1
+    wcwidth 0.9.2
+-->
+<link href="draft-petrie-vcon-agent-audit-roadmap.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  --font-title: "Sofia Sans Semi Condensed", sans-serif;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+section {
+  clear: both;
+}
+.section-number {
+  padding-right: 0.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 680;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
+}
+svg {
+  display: block;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
+}
+.alignCenter {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+  & :is(ol, ul) {
+    margin-left: 1em;
+  }
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+  & li {
+    margin-top: 0.5em;
+  }
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  margin: 0 0 0 2em;
+  & li {
+    margin: 0;
+    & :first-child { margin-top: 0; }
+    & :last-child { margin-bottom: 0; }
+  }
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+  &.olPercent {
+    --indent: 5ch;
+    & > dt {
+      min-width: calc(var(--indent) - 2ch);
+      float: none;
+    }
+  }
+
+  dl > dd > & {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+  }
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+  & > :is(:first-child, .break:first-child + *) {
+    margin-top: 0;
+  }
+  & > :is(:last-child) {
+    margin-bottom: 0;
+  }
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a {
+  text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
+}
+.iref + a[href].internal {
+  color: var(--text-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+  caption-side: bottom;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
+  }
+  pre, svg {
+    display: inline-block;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
+}
+
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+  &[href] {
+    color: var(--pilcrow-weak);
+    &:hover { text-decoration: none; }
+  }
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
+  }
+  @media print {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+  & dt {
+    width: var(--identifier-width);
+    min-width: var(--identifier-width);
+    clear: left;
+    float: left;
+    text-align: right;
+    margin-right: 1ch;
+  }
+  & dd {
+    margin: 0;
+    margin-left: calc(1em + var(--identifier-width)) !important;
+    min-width: 5em;
+  }
+  & .authors {
+    & .author {
+      display: inline-block;
+      margin-right: 1.5em;
+    }
+    & .org {
+      font-style: italic;
+    }
+  }
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+  & .prepared {
+    float: right;
+  }
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+
+  & nav {
+    & ul {
+      margin: 0 0.5em 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    & li {
+      line-height: 1.3em;
+      margin: 2px 0;
+      padding-left: 1.2em;
+      text-indent: -1.2em;
+    }
+  }
+  & a.xref {
+    white-space: normal;
+  }
+}
+
+.references {
+  & > dt {
+    text-align: right;
+    font-weight: bold;
+    min-width: 10ch;
+    margin-right: 1.5ch;
+    &:target::before {
+      content: "⇒";
+      margin: 0 10px 0 -25px;
+    }
+  }
+  & > dd {
+    margin-left: 12ch !important;
+    overflow: visible;
+    & .refInstance {
+      margin-bottom: 0.8em;
+    }
+    & .ascii {
+      margin-bottom: 0.25em;
+    }
+  }
+}
+
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  max-width: 20em;
+  margin: 1em auto 1em 0;
+
+  & .nameRole {
+    font-weight: 700;
+    margin-left: 0;
+  }
+  & .label {
+    margin: 0.5em 0;
+  }
+  & .type {
+    display: none;
+  }
+  & .alternative-contact {
+    margin: 0.5em 0 0.25em 0;
+  }
+  & .non-ascii {
+    margin: 0 0 0 2em;
+  }
+  & div.left {
+    text-align: left;
+  }
+  & div.right {
+    text-align: right;
+  }
+}
+
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
+  }
+}
+
+/* Comments */
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+
+@media screen {
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
+      }
+    }
+    & a.toplink {
+      float: right;
+    }
+  }
+}
+@media not screen {
+  #toc a.toplink {
+    display: none;
+  }
+}
+
+
+/* TOC layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
+    }
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
+  }
+}
+
+/* TOC layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc {
+    page-break-before: always;
+    border-top: none;
+    padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">vCon Agent Roadmap</td>
+<td class="right">October 2026</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Petrie</td>
+<td class="center">Expires 29 April 2027</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Virtualized Conversations</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-petrie-vcon-agent-audit-roadmap-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2026-10-26" class="published">26 October 2026</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Informational</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2027-04-29">29 April 2027</time></dd>
+<dt class="label-authors">Author:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">D. G Petrie</div>
+<div class="org">SIPez LLC</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">vCon for AI Agent Conversations: Requirements, Gaps and Extension Roadmap</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">AI agents converse with people, other agents and tools.
+There is a growing need to capture these conversations for audit, compliance and review.
+This document sorts the requirements for capturing agent conversations into those that fit vCon, those better met by plain logging and those that need other solutions.
+It then identifies the gaps in vCon and proposes a strawman set of vCon extensions to fill them.
+It is intended as a discussion document.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        The latest revision of this draft can be found at <span><a href="https://dgpetrie.github.io/draft-petrie-vcon-agent-audit-roadmap/draft-petrie-vcon-agent-audit-roadmap.html">https://dgpetrie.github.io/draft-petrie-vcon-agent-audit-roadmap/draft-petrie-vcon-agent-audit-roadmap.html</a></span>.
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-petrie-vcon-agent-audit-roadmap/">https://datatracker.ietf.org/doc/draft-petrie-vcon-agent-audit-roadmap/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">
+        Discussion of this document takes place on the
+        Virtualized Conversations Working Group mailing list (<span><a href="mailto:vcon@ietf.org">mailto:vcon@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/vcon/">https://mailarchive.ietf.org/arch/browse/vcon/</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/vcon/">https://www.ietf.org/mailman/listinfo/vcon/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/dgpetrie/draft-petrie-vcon-agent-audit-roadmap">https://github.com/dgpetrie/draft-petrie-vcon-agent-audit-roadmap</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 29 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2026 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-requirements-and-split" class="internal xref">Requirements and Split</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-vcon" class="internal xref">vCon</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-logging" class="internal xref">Logging</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-other-solutions" class="internal xref">Other Solutions</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-out-of-scope" class="internal xref">Out of Scope</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-gap-analysis" class="internal xref">Gap Analysis</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-strawman-vcon-extensions" class="internal xref">Strawman vCon Extensions</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-agent-party" class="internal xref">Agent Party</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-agent-dialog-content" class="internal xref">Agent Dialog Content</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-tool-definitions" class="internal xref">Tool Definitions</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
+                <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-tool-invocation-events" class="internal xref">Tool Invocation Events</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5">
+                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="auto internal xref">5.5</a>.  <a href="#name-permission-and-directive-ev" class="internal xref">Permission and Directive Events</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.6">
+                <p id="section-toc.1-1.5.2.6.1"><a href="#section-5.6" class="auto internal xref">5.6</a>.  <a href="#name-agent-analysis-types" class="internal xref">Agent Analysis Types</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.7">
+                <p id="section-toc.1-1.5.2.7.1"><a href="#section-5.7" class="auto internal xref">5.7</a>.  <a href="#name-token-usage" class="internal xref">Token Usage</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.8">
+                <p id="section-toc.1-1.5.2.8.1"><a href="#section-5.8" class="auto internal xref">5.8</a>.  <a href="#name-standard-analysis-media-typ" class="internal xref">Standard Analysis Media Types</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.9">
+                <p id="section-toc.1-1.5.2.9.1"><a href="#section-5.9" class="auto internal xref">5.9</a>.  <a href="#name-observer" class="internal xref">Observer</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.10">
+                <p id="section-toc.1-1.5.2.10.1"><a href="#section-5.10" class="auto internal xref">5.10</a>. <a href="#name-group" class="internal xref">Group</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.11">
+                <p id="section-toc.1-1.5.2.11.1"><a href="#section-5.11" class="auto internal xref">5.11</a>. <a href="#name-correlation" class="internal xref">Correlation</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-open-issues" class="internal xref">Open Issues</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-privacy-considerations" class="internal xref">Privacy Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
+                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">AI agents act on behalf of people and other agents.
+They exchange prompts and responses with people, delegate to other agents and invoke tools.
+Several drafts define requirements for recording these interactions (e.g. <span>[<a href="#VACR" class="cite xref">VACR</a>]</span> and <span>[<a href="#AUDIT-ARCH" class="cite xref">AUDIT-ARCH</a>]</span>).<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">vCon <span>[<a href="#VCON-CORE" class="cite xref">VCON-CORE</a>]</span> is a container for conversation data and the analysis of it.
+A vCon captures the observation of a conversation from one or more points in the network.
+An agent conversation is not that different from a contact center conversation in this respect.
+We do not want to solve all of this with vCon.
+vCon is a good fit for some of the requirements, but some are better met with plain logging and some need other solutions.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">This document:<a href="#section-1-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-1-4.1">
+          <p id="section-1-4.1.1">sorts the requirements into vCon, logging and other solutions<a href="#section-1-4.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-1-4.2">
+          <p id="section-1-4.2.1">identifies the gaps between the vCon requirements and <span>[<a href="#VCON-CORE" class="cite xref">VCON-CORE</a>]</span><a href="#section-1-4.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-1-4.3">
+          <p id="section-1-4.3.1">proposes a strawman break down of vCon extensions to fill the gaps<a href="#section-1-4.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-1-5">This is a first cut and is surely incomplete.
+We would like feedback on what is missing or should not be included.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<span id="name-example-observation-points"></span><div id="fig-observation">
+<figure id="figure-1">
+        <div class="alignLeft art-text artwork" id="section-1-6.1">
+<pre>
+ +------+   +-------+   +---------+   +----------+   +------+
+ | User |---| Agent |---|  Agent  |---| Subagent |---| Tool |
+ |      |   |       |   | Gateway |   |          |   |      |
+ +------+   +-------+   +---------+   +----------+   +------+
+    ^           ^            ^              ^            ^
+   (1)         (2)          (3)            (4)          (5)
+
+            (n) = example observation points
+</pre>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-example-observation-points" class="selfRef">Example Observation Points</a>
+        </figcaption></figure>
+</div>
+<p id="section-1-7">The observation points in <a href="#fig-observation" class="auto internal xref">Figure 1</a> are examples, not an exhaustive list.
+A conversation may be observed from any point in the network that it passes through, such as a gateway (e.g. <span>[<a href="#DMSC-PS" class="cite xref">DMSC-PS</a>]</span> and <span>[<a href="#DMSC-GW" class="cite xref">DMSC-GW</a>]</span>), a proxy or a platform.
+In back end scenarios where communications inside a silo are less secure, ordinary network entities may also be observers.
+Each observation may go in a single vCon or in separate vCons that are linked or merged later.
+This is the same as a contact center call, which may be observed by the carrier, the contact center platform or both.<a href="#section-1-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="conventions-and-definitions">
+<section id="section-2">
+      <h2 id="name-conventions-and-definitions">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+      </h2>
+<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<div id="terminology">
+<section id="section-2.1">
+        <h3 id="name-terminology">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
+        </h3>
+<p id="section-2.1-1">See section 2.1 of <span>[<a href="#VCON-CORE" class="cite xref">VCON-CORE</a>]</span> for terminology used in this document.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2.1-2">
+          <dt id="section-2.1-2.1">Agent:</dt>
+          <dd style="margin-left: 1.5em" id="section-2.1-2.2">
+            <p id="section-2.1-2.2.1">TODO borrow from <span>[<a href="#AGENTIC-REQS" class="cite xref">AGENTIC-REQS</a>]</span> or <span>[<a href="#AUDIT-ARCH" class="cite xref">AUDIT-ARCH</a>]</span><a href="#section-2.1-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-2.1-2.3">Tool:</dt>
+          <dd style="margin-left: 1.5em" id="section-2.1-2.4">
+            <p id="section-2.1-2.4.1">TODO borrow from <span>[<a href="#AGENTIC-REQS" class="cite xref">AGENTIC-REQS</a>]</span><a href="#section-2.1-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-2.1-2.5">Observation Point:</dt>
+          <dd style="margin-left: 1.5em" id="section-2.1-2.6">
+            <p id="section-2.1-2.6.1">TODO the point in the network from which a conversation is observed and recorded<a href="#section-2.1-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="requirements-and-split">
+<section id="section-3">
+      <h2 id="name-requirements-and-split">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-requirements-and-split" class="section-name selfRef">Requirements and Split</a>
+      </h2>
+<p id="section-3-1">The requirements considered here come from two sources:<a href="#section-3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3-2.1">
+          <p id="section-3-2.1.1">REQ-1 through REQ-11 in section 2.2 of <span>[<a href="#VACR" class="cite xref">VACR</a>]</span><a href="#section-3-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-2.2">
+          <p id="section-3-2.2.1">the four record types in section 5 of <span>[<a href="#AUDIT-ARCH" class="cite xref">AUDIT-ARCH</a>]</span><a href="#section-3-2.2.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-3-3">Related work on AI logging includes <span>[<a href="#ISO-24970" class="cite xref">ISO-24970</a>]</span>.
+We only briefly summarize the requirements here, enough to jog the memory of someone who has read the source drafts.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">Each requirement is put into one or more of the following categories:<a href="#section-3-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3-5.1">
+          <p id="section-3-5.1.1">vCon - the conversation and the analysis of it<a href="#section-3-5.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-5.2">
+          <p id="section-3-5.2.1">Logging - system and operational events<a href="#section-3-5.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-5.3">
+          <p id="section-3-5.3.1">Other Solutions - existing or other IETF work<a href="#section-3-5.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-3-6">Some requirements are split across categories.<a href="#section-3-6" class="pilcrow">¶</a></p>
+<p id="section-3-7">The agent protocols themselves (e.g. <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> and those in <span>[<a href="#AGENTIC-REQS" class="cite xref">AGENTIC-REQS</a>]</span>) are not candidates for capture in vCon.
+The data exchanged over them, and the results of them that bear on the conversation (e.g. identity or the tools discovered), are candidates for observation and capture in vCon.<a href="#section-3-7" class="pilcrow">¶</a></p>
+<div id="vcon">
+<section id="section-3.1">
+        <h3 id="name-vcon">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-vcon" class="section-name selfRef">vCon</a>
+        </h3>
+<p id="section-3.1-1">From <span>[<a href="#VACR" class="cite xref">VACR</a>]</span>:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.1-2.1">
+            <p id="section-3.1-2.1.1">REQ-1, REQ-4 Event Logging and Type: conversation level events such as session start and end and permission requests and grants<a href="#section-3.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-2.2">
+            <p id="section-3.1-2.2.1">REQ-3 Actor Identification: people, agents and tools as parties<a href="#section-3.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-2.3">
+            <p id="section-3.1-2.3.1">REQ-5 Input/Output Recording: prompts, responses, agent to agent messages and tool invocations and results, with reasoning traces as analysis<a href="#section-3.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-2.4">
+            <p id="section-3.1-2.4.1">REQ-7 Tamper-Evidence and Integrity: integrity of the record itself, signing and encryption<a href="#section-3.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-2.5">
+            <p id="section-3.1-2.5.1">REQ-10 Human Oversight: a reviewable and redactable record of the conversation<a href="#section-3.1-2.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-2.6">
+            <p id="section-3.1-2.6.1">REQ-11 Traceability: one vCon with one or more observation points, or separate vCons linked or merged later<a href="#section-3.1-2.6.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.1-3">The same conversation observed from different points may result in different, duplicate or conflicting data.
+vCon records observations, it does not reconcile them.
+Conflicting observations are kept, each attributed to its observer.
+Any reconciliation can be added as an Analysis.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-4">Token usage is partially captured in vCon today, as vendor responses (e.g. from a LLM or transcription service) are often attached as an Analysis and include token counts.
+A more formal definition of token usage would be useful to contact center as well as agent to agent and audit scenarios.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+<p id="section-3.1-5">From <span>[<a href="#AUDIT-ARCH" class="cite xref">AUDIT-ARCH</a>]</span>:<a href="#section-3.1-5" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.1-6.1">
+            <p id="section-3.1-6.1.1">Interaction Records: prompts, responses, approvals, refusals and agent to agent dialog<a href="#section-3.1-6.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-6.2">
+            <p id="section-3.1-6.2.1">Action Records: the agent view of a tool invocation, the tool or service side record is another observation point which may go in the same vCon, a linked vCon or a log<a href="#section-3.1-6.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-6.3">
+            <p id="section-3.1-6.3.1">Delegation Records: only the structure of which agent delegated to which subagent (i.e. Session and Session_Reference)<a href="#section-3.1-6.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-6.4">
+            <p id="section-3.1-6.4.1">Authorization Transition Records: only the parts requested of a person or agent in the conversation<a href="#section-3.1-6.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="logging">
+<section id="section-3.2">
+        <h3 id="name-logging">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-logging" class="section-name selfRef">Logging</a>
+        </h3>
+<p id="section-3.2-1">From <span>[<a href="#VACR" class="cite xref">VACR</a>]</span>:<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2-2.1">
+            <p id="section-3.2-2.1.1">REQ-1, REQ-4 Event Logging and Type: system level events such as configuration and prompt changes and infrastructure events<a href="#section-3.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.2-2.2">
+            <p id="section-3.2-2.2.1">REQ-2 Timestamp: clock synchronization<a href="#section-3.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.2-2.3">
+            <p id="section-3.2-2.3.1">REQ-8 Incident Response: queries over logs and vCons<a href="#section-3.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.2-2.4">
+            <p id="section-3.2-2.4.1">REQ-9 Anomaly and Risk Detection: queries over logs and vCons<a href="#section-3.2-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.2-3">From <span>[<a href="#AUDIT-ARCH" class="cite xref">AUDIT-ARCH</a>]</span>:<a href="#section-3.2-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2-4.1">
+            <p id="section-3.2-4.1.1">Action Records: the tool or service side record, when not put in a vCon<a href="#section-3.2-4.1.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.2-5"><span>[<a href="#AAT" class="cite xref">AAT</a>]</span> and <span>[<a href="#OTEL-GENAI" class="cite xref">OTEL-GENAI</a>]</span> are examples of logging formats for agents.<a href="#section-3.2-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="other-solutions">
+<section id="section-3.3">
+        <h3 id="name-other-solutions">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-other-solutions" class="section-name selfRef">Other Solutions</a>
+        </h3>
+<p id="section-3.3-1">From <span>[<a href="#VACR" class="cite xref">VACR</a>]</span>:<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.3-2.1">
+            <p id="section-3.3-2.1.1">REQ-6 Retention Period: storage and policy<a href="#section-3.3-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.3-2.2">
+            <p id="section-3.3-2.2.1">REQ-7 Tamper-Evidence and Integrity: non-repudiation and attestation (e.g. <span>[<a href="#SCITT" class="cite xref">SCITT</a>]</span> and <span>[<a href="#RATS" class="cite xref">RATS</a>]</span>)<a href="#section-3.3-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.3-3">From <span>[<a href="#AUDIT-ARCH" class="cite xref">AUDIT-ARCH</a>]</span>:<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.3-4.1">
+            <p id="section-3.3-4.1.1">Delegation Records: the delegated authority itself (e.g. OAuth tokens and WIMSE)<a href="#section-3.3-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.3-4.2">
+            <p id="section-3.3-4.2.1">Authorization Transition Records: token level state changes<a href="#section-3.3-4.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.3-4.3">
+            <p id="section-3.3-4.3.1">propagation of audit context (e.g. trace ID) across domains<a href="#section-3.3-4.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="out-of-scope">
+<section id="section-3.4">
+        <h3 id="name-out-of-scope">
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-out-of-scope" class="section-name selfRef">Out of Scope</a>
+        </h3>
+<ul class="normal">
+<li class="normal" id="section-3.4-1.1">
+            <p id="section-3.4-1.1.1">TODO: code provenance<a href="#section-3.4-1.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.4-1.2">
+            <p id="section-3.4-1.2.1">TODO: using vCon to make or enforce decisions during the conversation (e.g. allowing or blocking a tool invocation)<a href="#section-3.4-1.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.4-1.3">
+            <p id="section-3.4-1.3.1">TODO: the transport between agents<a href="#section-3.4-1.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+</section>
+</div>
+<div id="gap-analysis">
+<section id="section-4">
+      <h2 id="name-gap-analysis">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-gap-analysis" class="section-name selfRef">Gap Analysis</a>
+      </h2>
+<p id="section-4-1">The following compares the vCon requirements in <a href="#vcon" class="auto internal xref">Section 3.1</a> with what <span>[<a href="#VCON-CORE" class="cite xref">VCON-CORE</a>]</span> already provides.
+The gaps are filled by the strawman extensions in <a href="#strawman-vcon-extensions" class="auto internal xref">Section 5</a>.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4-2.1">
+          <p id="section-4-2.1.1">REQ-1, REQ-4 Event Logging and Type<a href="#section-4-2.1.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4-2.1.2.1">
+              <p id="section-4-2.1.2.1.1">Covered: Session start and duration, join and drop Events<a href="#section-4-2.1.2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.1.2.2">
+              <p id="section-4-2.1.2.2.1">Gap: permission and directive requests and responses -&gt; <a href="#permission-and-directive-events" class="auto internal xref">Section 5.5</a><a href="#section-4-2.1.2.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</li>
+        <li class="normal" id="section-4-2.2">
+          <p id="section-4-2.2.1">REQ-3 Actor Identification<a href="#section-4-2.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4-2.2.2.1">
+              <p id="section-4-2.2.2.1.1">Covered: Party Object, including type "bot", uuid, did and validation<a href="#section-4-2.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.2.2.2">
+              <p id="section-4-2.2.2.2.1">Gap: agent attributes such as model, provider, framework, version and workload identity -&gt; <a href="#agent-party" class="auto internal xref">Section 5.1</a><a href="#section-4-2.2.2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.2.2.3">
+              <p id="section-4-2.2.2.3.1">TODO: is the Party type "bot" sufficient, or are there kinds of agents that need to be distinguished beyond these attributes?<a href="#section-4-2.2.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.2.2.4">
+              <p id="section-4-2.2.2.4.1">Gap: tools, which are named resources rather than Parties -&gt; <a href="#tool-definitions" class="auto internal xref">Section 5.3</a><a href="#section-4-2.2.2.4.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</li>
+        <li class="normal" id="section-4-2.3">
+          <p id="section-4-2.3.1">REQ-5 Input/Output Recording<a href="#section-4-2.3.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4-2.3.2.1">
+              <p id="section-4-2.3.2.1.1">Covered: text Dialog for prompts, responses and agent to agent messages<a href="#section-4-2.3.2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.3.2.2">
+              <p id="section-4-2.3.2.2.1">Gap: structured agent to agent content that is not just text, audio or video -&gt; <a href="#agent-dialog-content" class="auto internal xref">Section 5.2</a><a href="#section-4-2.3.2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.3.2.3">
+              <p id="section-4-2.3.2.3.1">Gap: tool invocations and results -&gt; <a href="#tool-invocation-events" class="auto internal xref">Section 5.4</a><a href="#section-4-2.3.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.3.2.4">
+              <p id="section-4-2.3.2.4.1">Gap: the tools available to an agent and their definitions -&gt; <a href="#tool-definitions" class="auto internal xref">Section 5.3</a><a href="#section-4-2.3.2.4.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.3.2.5">
+              <p id="section-4-2.3.2.5.1">Partial: reasoning traces can be an Analysis today, but there is no Analysis type for them -&gt; <a href="#agent-analysis-types" class="auto internal xref">Section 5.6</a><a href="#section-4-2.3.2.5.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.3.2.6">
+              <p id="section-4-2.3.2.6.1">Partial: token usage is often in an attached vendor response, but is not formally defined -&gt; <a href="#token-usage" class="auto internal xref">Section 5.7</a><a href="#section-4-2.3.2.6.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</li>
+        <li class="normal" id="section-4-2.4">
+          <p id="section-4-2.4.1">REQ-7 Tamper-Evidence and Integrity<a href="#section-4-2.4.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4-2.4.2.1">
+              <p id="section-4-2.4.2.1.1">Covered: signed and encrypted forms and content_hash<a href="#section-4-2.4.2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.4.2.2">
+              <p id="section-4-2.4.2.2.1">Gap: none<a href="#section-4-2.4.2.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</li>
+        <li class="normal" id="section-4-2.5">
+          <p id="section-4-2.5.1">REQ-10 Human Oversight<a href="#section-4-2.5.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4-2.5.2.1">
+              <p id="section-4-2.5.2.1.1">Covered: redacted and amended<a href="#section-4-2.5.2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.5.2.2">
+              <p id="section-4-2.5.2.2.1">Gap: none beyond the other gaps listed here<a href="#section-4-2.5.2.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</li>
+        <li class="normal" id="section-4-2.6">
+          <p id="section-4-2.6.1">REQ-11 Traceability<a href="#section-4-2.6.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4-2.6.2.1">
+              <p id="section-4-2.6.2.1.1">Covered: Session and Session_Reference, including the AI Agent example in the sessions Objects Array section of <span>[<a href="#VCON-CORE" class="cite xref">VCON-CORE</a>]</span><a href="#section-4-2.6.2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.6.2.2">
+              <p id="section-4-2.6.2.2.1">Covered: an observer can be a Party<a href="#section-4-2.6.2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.6.2.3">
+              <p id="section-4-2.6.2.3.1">Gap: which observer captured which Dialog, Event or Analysis, and where it was in the network -&gt; <a href="#observer" class="auto internal xref">Section 5.9</a><a href="#section-4-2.6.2.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.6.2.4">
+              <p id="section-4-2.6.2.4.1">Gap: grouping or linking separate vCons, as Session_Reference only refers to Sessions in the same vCon -&gt; <a href="#group" class="auto internal xref">Section 5.10</a><a href="#section-4-2.6.2.4.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.6.2.5">
+              <p id="section-4-2.6.2.5.1">Gap: correlation with audit context outside of the vCon -&gt; <a href="#correlation" class="auto internal xref">Section 5.11</a><a href="#section-4-2.6.2.5.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</li>
+        <li class="normal" id="section-4-2.7">
+          <p id="section-4-2.7.1">General, also applies to contact centers<a href="#section-4-2.7.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4-2.7.2.1">
+              <p id="section-4-2.7.2.1.1">Covered: Analysis mediatype, vendor, product and schema<a href="#section-4-2.7.2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-4-2.7.2.2">
+              <p id="section-4-2.7.2.2.1">Gap: no standard media types for the data of common analysis (e.g. transcripts), making it hard to use one analysis as input to another -&gt; <a href="#standard-analysis-media-types" class="auto internal xref">Section 5.8</a><a href="#section-4-2.7.2.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</li>
+      </ul>
+<p id="section-4-3">The <span>[<a href="#AUDIT-ARCH" class="cite xref">AUDIT-ARCH</a>]</span> record types map onto the same gaps.
+Interaction Records are covered by Dialog and <a href="#permission-and-directive-events" class="auto internal xref">Section 5.5</a>.
+The agent view of an Action Record is covered by <a href="#tool-invocation-events" class="auto internal xref">Section 5.4</a>, the tool or service side by <a href="#observer" class="auto internal xref">Section 5.9</a>.
+The structure of Delegation Records is covered by Session and Session_Reference.
+The conversation parts of Authorization Transition Records are covered by <a href="#permission-and-directive-events" class="auto internal xref">Section 5.5</a>.<a href="#section-4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="strawman-vcon-extensions">
+<section id="section-5">
+      <h2 id="name-strawman-vcon-extensions">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-strawman-vcon-extensions" class="section-name selfRef">Strawman vCon Extensions</a>
+      </h2>
+<p id="section-5-1">TODO: one subsection per extension: gap and a sketch.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">Each of the following is listed as a separate extension.
+Some could be bundled into a single draft, for example:<a href="#section-5-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-5-3.1">
+          <p id="section-5-3.1.1">AI Agent: <a href="#agent-party" class="auto internal xref">Section 5.1</a> and <a href="#agent-dialog-content" class="auto internal xref">Section 5.2</a><a href="#section-5-3.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-5-3.2">
+          <p id="section-5-3.2.1">Tools: <a href="#tool-definitions" class="auto internal xref">Section 5.3</a> and <a href="#tool-invocation-events" class="auto internal xref">Section 5.4</a><a href="#section-5-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-5-3.3">
+          <p id="section-5-3.3.1">Analysis Data: <a href="#agent-analysis-types" class="auto internal xref">Section 5.6</a>, <a href="#token-usage" class="auto internal xref">Section 5.7</a> and <a href="#standard-analysis-media-types" class="auto internal xref">Section 5.8</a><a href="#section-5-3.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-5-3.4">
+          <p id="section-5-3.4.1">Multiple vCons: <a href="#group" class="auto internal xref">Section 5.10</a> and <a href="#correlation" class="auto internal xref">Section 5.11</a>, with <a href="#observer" class="auto internal xref">Section 5.9</a><a href="#section-5-3.4.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<div id="agent-party">
+<section id="section-5.1">
+        <h3 id="name-agent-party">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-agent-party" class="section-name selfRef">Agent Party</a>
+        </h3>
+<p id="section-5.1-1">TODO: model, provider, framework, version and workload identity.
+TODO: the model may change mid conversation, so it may be a Session or Dialog parameter, with an Event to mark the change.
+TODO: workload identity (e.g. WIMSE), possibly via the existing did parameter or a new one.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="agent-dialog-content">
+<section id="section-5.2">
+        <h3 id="name-agent-dialog-content">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-agent-dialog-content" class="section-name selfRef">Agent Dialog Content</a>
+        </h3>
+<p id="section-5.2-1">TODO: a new Dialog type, or at least a new media type for Dialog content, for structured agent to agent exchanges (e.g. a JSON container).
+TODO: tweak the text Dialog definition in <span>[<a href="#VCON-CORE" class="cite xref">VCON-CORE</a>]</span>, or justify agent messages as transcribable text.
+TODO: the <span>[<a href="#VACR" class="cite xref">VACR</a>]</span> media type covers a whole record, not a single one directional message, ask for a single entry media type or define one.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="tool-definitions">
+<section id="section-5.3">
+        <h3 id="name-tool-definitions">
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-tool-definitions" class="section-name selfRef">Tool Definitions</a>
+        </h3>
+<p id="section-5.3-1">TODO: revisit with more detail.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="tool-invocation-events">
+<section id="section-5.4">
+        <h3 id="name-tool-invocation-events">
+<a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-tool-invocation-events" class="section-name selfRef">Tool Invocation Events</a>
+        </h3>
+<p id="section-5.4-1">TODO: <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> based, the first example extension, see draft-petrie-vcon-tool-invocation.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="permission-and-directive-events">
+<section id="section-5.5">
+        <h3 id="name-permission-and-directive-ev">
+<a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-permission-and-directive-ev" class="section-name selfRef">Permission and Directive Events</a>
+        </h3>
+<p id="section-5.5-1">Permission and directive requests occur within tool invocations (e.g. <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> elicitation), as well as directly in dialog with an AI agent.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<p id="section-5.5-2">TODO: more than yes/no, menus of options and other directive input requests.
+TODO: <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> elicitation (form and URL modes, accept, decline and cancel) as a model.
+TODO: <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> does not define a message for tool invocation approval, that is left to the host.<a href="#section-5.5-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="agent-analysis-types">
+<section id="section-5.6">
+        <h3 id="name-agent-analysis-types">
+<a href="#section-5.6" class="section-number selfRef">5.6. </a><a href="#name-agent-analysis-types" class="section-name selfRef">Agent Analysis Types</a>
+        </h3>
+<p id="section-5.6-1">TODO: reasoning traces.<a href="#section-5.6-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="token-usage">
+<section id="section-5.7">
+        <h3 id="name-token-usage">
+<a href="#section-5.7" class="section-number selfRef">5.7. </a><a href="#name-token-usage" class="section-name selfRef">Token Usage</a>
+        </h3>
+<p id="section-5.7-1">TODO: supplemental data on the Analysis Object, separate from the analysis content, and on Dialog generated by a LLM.
+TODO: applies to contact centers as well.<a href="#section-5.7-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="standard-analysis-media-types">
+<section id="section-5.8">
+        <h3 id="name-standard-analysis-media-typ">
+<a href="#section-5.8" class="section-number selfRef">5.8. </a><a href="#name-standard-analysis-media-typ" class="section-name selfRef">Standard Analysis Media Types</a>
+        </h3>
+<p id="section-5.8-1">TODO: standard media types for the data of common analysis, starting with transcripts.
+TODO: applies to contact centers as well.<a href="#section-5.8-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="observer">
+<section id="section-5.9">
+        <h3 id="name-observer">
+<a href="#section-5.9" class="section-number selfRef">5.9. </a><a href="#name-observer" class="section-name selfRef">Observer</a>
+        </h3>
+<p id="section-5.9-1">TODO: applies to contact centers as well.
+TODO: may be mostly a definition of how to use the existing schema (e.g. observer as a Party), rather than new parameters, plus observer location or entity.<a href="#section-5.9-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="group">
+<section id="section-5.10">
+        <h3 id="name-group">
+<a href="#section-5.10" class="section-number selfRef">5.10. </a><a href="#name-group" class="section-name selfRef">Group</a>
+        </h3>
+<p id="section-5.10-1">TODO: a Group Object that refers to zero or more vCons, grouping vCons in a similar way that Session groups Dialog.
+TODO: the "group" parameter is reserved in the vCon Object Parameter Names Registry in <span>[<a href="#VCON-CORE" class="cite xref">VCON-CORE</a>]</span>.
+TODO: different from Observer perspectives, but may need to support them.<a href="#section-5.10-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="correlation">
+<section id="section-5.11">
+        <h3 id="name-correlation">
+<a href="#section-5.11" class="section-number selfRef">5.11. </a><a href="#name-correlation" class="section-name selfRef">Correlation</a>
+        </h3>
+<p id="section-5.11-1">TODO: AUDIT trace ID, parent ID and delegation chain.<a href="#section-5.11-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="open-issues">
+<section id="section-6">
+      <h2 id="name-open-issues">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-open-issues" class="section-name selfRef">Open Issues</a>
+      </h2>
+<ul class="normal">
+<li class="normal" id="section-6-1.1">
+          <p id="section-6-1.1.1">TODO: is the Party type "bot" sufficient for agents, or are there kinds of agents to distinguish beyond model, provider, framework, version and workload identity<a href="#section-6-1.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-6-1.2">
+          <p id="section-6-1.2.1">TODO: where the tool side record of an invocation goes<a href="#section-6-1.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-6-1.3">
+          <p id="section-6-1.3.1">TODO: Observer as an extension or later in core<a href="#section-6-1.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-6-1.4">
+          <p id="section-6-1.4.1">TODO: overlap between Agent Analysis Types and Standard Analysis Media Types<a href="#section-6-1.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-6-1.5">
+          <p id="section-6-1.5.1">TODO: linking, merging and de-duplicating vCons of the same conversation from different observation points, and handling conflicts<a href="#section-6-1.5.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-7">
+      <h2 id="name-security-considerations">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<ul class="normal">
+<li class="normal" id="section-7-1.1">
+          <p id="section-7-1.1.1">TODO<a href="#section-7-1.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+</section>
+</div>
+<div id="privacy-considerations">
+<section id="section-8">
+      <h2 id="name-privacy-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-privacy-considerations" class="section-name selfRef">Privacy Considerations</a>
+      </h2>
+<ul class="normal">
+<li class="normal" id="section-8-1.1">
+          <p id="section-8-1.1.1">TODO<a href="#section-8-1.1.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+</section>
+</div>
+<div id="iana-considerations">
+<section id="section-9">
+      <h2 id="name-iana-considerations">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-9-1">TBD<a href="#section-9-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sec-combined-references">
+<section id="section-10">
+      <h2 id="name-references">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-10.1">
+        <h3 id="name-normative-references">
+<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+      <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-10.2">
+        <h3 id="name-informative-references">
+<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="AAT">[AAT]</dt>
+        <dd>
+<span class="refAuthor">Sharif, R.</span>, <span class="refTitle">"Agent Audit Trail: A Standard Logging Format for Autonomous AI Systems"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-sharif-agent-audit-trail-08</span>, <time datetime="2026-10-13" class="refDate">13 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-sharif-agent-audit-trail-08">https://datatracker.ietf.org/doc/html/draft-sharif-agent-audit-trail-08</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="AGENTIC-REQS">[AGENTIC-REQS]</dt>
+        <dd>
+<span class="refAuthor">Reddy.K, T.</span>, <span class="refAuthor">Sarker, Z.</span>, and <span class="refAuthor">K. Yao</span>, <span class="refTitle">"Agentic AI Use Cases and Requirements"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-agentic-ai-usecases-requirements-04</span>, <time datetime="2026-10-15" class="refDate">15 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-agentic-ai-usecases-requirements-04">https://datatracker.ietf.org/doc/html/draft-agentic-ai-usecases-requirements-04</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="AUDIT-ARCH">[AUDIT-ARCH]</dt>
+        <dd>
+<span class="refAuthor">Kühlewind, M.</span> and <span class="refAuthor">H. Birkholz</span>, <span class="refTitle">"An Architecture for Auditing Agent Delegation and Interactions"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-kuehlewind-audit-architecture-01</span>, <time datetime="2026-09-07" class="refDate">7 September 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-kuehlewind-audit-architecture-01">https://datatracker.ietf.org/doc/html/draft-kuehlewind-audit-architecture-01</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="DMSC-GW">[DMSC-GW]</dt>
+        <dd>
+<span class="refAuthor">Liu, B.</span>, <span class="refTitle">"Gateway Requirements for Dynamic Multi-agents Secured Collaboration"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-liu-dmsc-gw-requirements-00</span>, <time datetime="2026-01-16" class="refDate">16 January 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-liu-dmsc-gw-requirements-00">https://datatracker.ietf.org/doc/html/draft-liu-dmsc-gw-requirements-00</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="DMSC-PS">[DMSC-PS]</dt>
+        <dd>
+<span class="refAuthor">Song, E.</span>, <span class="refAuthor">Song, Y.</span>, <span class="refAuthor">Zhang, S.</span>, <span class="refAuthor">Li, X.</span>, and <span class="refAuthor">J. Zhao</span>, <span class="refTitle">"Problem Statement and Requirements for Dynamic Multi-agent Secured Collaboration (DMSC)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-song-dmsc-problem-statement-00</span>, <time datetime="2026-03-02" class="refDate">2 March 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-song-dmsc-problem-statement-00">https://datatracker.ietf.org/doc/html/draft-song-dmsc-problem-statement-00</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="ISO-24970">[ISO-24970]</dt>
+        <dd>
+<span class="refAuthor">International Organization for Standardization</span>, <span class="refTitle">"Artificial intelligence - AI system logging"</span>, <span class="refContent">ISO/IEC DIS 24970</span>, <span>n.d.</span>, <span>&lt;<a href="https://www.iso.org/standard/88723.html">https://www.iso.org/standard/88723.html</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="MCP">[MCP]</dt>
+        <dd>
+<span class="refTitle">"Model Context Protocol Specification"</span>, <span>n.d.</span>, <span>&lt;<a href="https://modelcontextprotocol.io/specification/">https://modelcontextprotocol.io/specification/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="OTEL-GENAI">[OTEL-GENAI]</dt>
+        <dd>
+<span class="refTitle">"OpenTelemetry Semantic Conventions for Generative AI"</span>, <span>n.d.</span>, <span>&lt;<a href="https://github.com/open-telemetry/semantic-conventions-genai">https://github.com/open-telemetry/semantic-conventions-genai</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RATS">[RATS]</dt>
+        <dd>
+<span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Thaler, D.</span>, <span class="refAuthor">Richardson, M.</span>, <span class="refAuthor">Smith, N.</span>, and <span class="refAuthor">W. Pan</span>, <span class="refTitle">"Remote ATtestation procedureS (RATS) Architecture"</span>, <span class="seriesInfo">RFC 9334</span>, <span class="seriesInfo">DOI 10.17487/RFC9334</span>, <time datetime="2023-01" class="refDate">January 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9334">https://www.rfc-editor.org/rfc/rfc9334</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="SCITT">[SCITT]</dt>
+        <dd>
+<span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Delignat-Lavaud, A.</span>, <span class="refAuthor">Fournet, C.</span>, <span class="refAuthor">Deshpande, Y.</span>, and <span class="refAuthor">S. Lasker</span>, <span class="refTitle">"An Architecture for Trustworthy and Transparent Digital Supply Chains"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-scitt-architecture-22</span>, <time datetime="2025-10-10" class="refDate">10 October 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-scitt-architecture-22">https://datatracker.ietf.org/doc/html/draft-ietf-scitt-architecture-22</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="VACR">[VACR]</dt>
+        <dd>
+<span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Heldt, T.</span>, and <span class="refAuthor">O. Steele</span>, <span class="refTitle">"Verifiable Agent Conversation Records"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-birkholz-verifiable-agent-conversations-01</span>, <time datetime="2026-08-31" class="refDate">31 August 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-birkholz-verifiable-agent-conversations-01">https://datatracker.ietf.org/doc/html/draft-birkholz-verifiable-agent-conversations-01</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="VCON-CORE">[VCON-CORE]</dt>
+      <dd>
+<span class="refAuthor">Petrie, D.</span>, <span class="refTitle">"The JSON format for vCon - Conversation Data Container"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-vcon-vcon-core-04</span>, <time datetime="2026-09-07" class="refDate">7 September 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-vcon-vcon-core-04">https://datatracker.ietf.org/doc/html/draft-ietf-vcon-vcon-core-04</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-A">
+      <h2 id="name-acknowledgments">
+<a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+    </h2>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-B">
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Daniel G Petrie</span></div>
+<div dir="auto" class="left"><span class="org">SIPez LLC</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:dan.ietf@sipez.com" class="email">dan.ietf@sipez.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
