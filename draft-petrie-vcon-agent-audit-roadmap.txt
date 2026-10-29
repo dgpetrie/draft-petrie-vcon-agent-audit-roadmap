@@ -4,8 +4,8 @@
 
 Virtualized Conversations                                    D. G Petrie
 Internet-Draft                                                 SIPez LLC
-Intended status: Informational                           26 October 2026
-Expires: 29 April 2027
+Intended status: Informational                           29 October 2026
+Expires: 2 May 2027
 
 
    vCon for AI Agent Conversations: Requirements, Gaps and Extension
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 April 2027.
+   This Internet-Draft will expire on 2 May 2027.
 
 Copyright Notice
 
@@ -163,12 +163,17 @@ Table of Contents
 
    See section 2.1 of [VCON-CORE] for terminology used in this document.
 
-   Agent:  TODO borrow from [AGENTIC-REQS] or [AUDIT-ARCH]
+   Agent: As defined in [AUDIT-ARCH], "a Workload whose behaviour is
+   driven, in whole or in part, by a non-deterministic decision process
+   (typically an LLM)".
 
-   Tool:  TODO borrow from [AGENTIC-REQS]
+   Tool: As defined in [AGENTIC-REQS], "an external service invoked by
+   an agent to retrieve data or perform operations.  A tool is not
+   necessarily an agent and may not participate in agent-to-agent
+   communication."
 
-   Observation Point:  TODO the point in the network from which a
-      conversation is observed and recorded
+   Observation Point: A point in the network from which a conversation,
+   or part of it, is observed and recorded (see Figure 1).
 
 3.  Requirements and Split
 
@@ -429,6 +434,26 @@ Table of Contents
 
    Permission and directive requests occur within tool invocations (e.g.
    [MCP] elicitation), as well as directly in dialog with an AI agent.
+
+   There are two distinct things to record.
+
+   The first is a policy decision made by the agent or its host before
+   acting (e.g. before invoking a tool).  The outcome may be that no
+   permission is needed, that permission is required or that the action
+   is disallowed.  No one is asked, so there is no conversation, only
+   the decision and what it applies to.  In some cases it is likely
+   desirable to also capture the reason for the decision (e.g. why an
+   action was disallowed).
+
+   The second is a request for permission or input to the person or
+   agent on whose behalf the agent is acting, and their response.  This
+   is part of the conversation.  The response may be more than yes or no
+   (e.g. allow once, allow for the Session, always allow or a choice
+   from a menu).
+
+   Only a decision that permission is required is followed by a request.
+   The two are different and need distinct ways of being recorded in the
+   vCon.  [AAT] and [AUDIT-ARCH] partially capture this distinction.
    Before a tool is invoked, the agent or its host decides by policy
    whether the tool may be used.  The decision is one of no permission
    needed, permission required or tool use disallowed.  The decision is
@@ -440,10 +465,9 @@ Table of Contents
    decision is in scope, making or enforcing it is not (see
    Section 3.4).
 
-   TODO: more than yes/no, menus of options and other directive input
-   requests.  TODO: [MCP] elicitation (form and URL modes, accept,
-   decline and cancel) as a model.  TODO: [MCP] does not define a
-   message for tool invocation approval, that is left to the host.
+   TODO: [MCP] elicitation (form and URL modes, accept, decline and
+   cancel) as a model.  TODO: [MCP] does not define a message for tool
+   invocation approval, that is left to the host.
 
 5.6.  Agent Analysis Types
 
@@ -524,16 +548,16 @@ Table of Contents
 
    [AAT]      Sharif, R., "Agent Audit Trail: A Standard Logging Format
               for Autonomous AI Systems", Work in Progress, Internet-
-              Draft, draft-sharif-agent-audit-trail-08, 13 October 2026,
+              Draft, draft-sharif-agent-audit-trail-09, 26 October 2026,
               <https://datatracker.ietf.org/doc/html/draft-sharif-agent-
-              audit-trail-08>.
+              audit-trail-09>.
 
    [AGENTIC-REQS]
               Reddy.K, T., Sarker, Z., and K. Yao, "Agentic AI Use Cases
               and Requirements", Work in Progress, Internet-Draft,
-              draft-agentic-ai-usecases-requirements-04, 15 October
+              draft-agentic-ai-usecases-requirements-05, 27 October
               2026, <https://datatracker.ietf.org/doc/html/draft-
-              agentic-ai-usecases-requirements-04>.
+              agentic-ai-usecases-requirements-05>.
 
    [AUDIT-ARCH]
               Kühlewind, M. and H. Birkholz, "An Architecture for

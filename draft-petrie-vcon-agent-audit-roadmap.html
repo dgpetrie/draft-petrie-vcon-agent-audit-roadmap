@@ -1056,7 +1056,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Petrie</td>
-<td class="center">Expires 29 April 2027</td>
+<td class="center">Expires 2 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1069,12 +1069,12 @@ svg {
 <dd class="internet-draft">draft-petrie-vcon-agent-audit-roadmap-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-10-26" class="published">26 October 2026</time>
+<time datetime="2026-10-29" class="published">29 October 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-04-29">29 April 2027</time></dd>
+<dd class="expires"><time datetime="2027-05-02">2 May 2027</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1128,7 +1128,7 @@ It is intended as a discussion document.<a href="#section-abstract-1" class="pil
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 29 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 2 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1326,23 +1326,9 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
         </h3>
 <p id="section-2.1-1">See section 2.1 of <span>[<a href="#VCON-CORE" class="cite xref">VCON-CORE</a>]</span> for terminology used in this document.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-2.1-2">
-          <dt id="section-2.1-2.1">Agent:</dt>
-          <dd style="margin-left: 1.5em" id="section-2.1-2.2">
-            <p id="section-2.1-2.2.1">TODO borrow from <span>[<a href="#AGENTIC-REQS" class="cite xref">AGENTIC-REQS</a>]</span> or <span>[<a href="#AUDIT-ARCH" class="cite xref">AUDIT-ARCH</a>]</span><a href="#section-2.1-2.2.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-2.1-2.3">Tool:</dt>
-          <dd style="margin-left: 1.5em" id="section-2.1-2.4">
-            <p id="section-2.1-2.4.1">TODO borrow from <span>[<a href="#AGENTIC-REQS" class="cite xref">AGENTIC-REQS</a>]</span><a href="#section-2.1-2.4.1" class="pilcrow">¶</a></p>
-</dd>
-          <dd class="break"></dd>
-<dt id="section-2.1-2.5">Observation Point:</dt>
-          <dd style="margin-left: 1.5em" id="section-2.1-2.6">
-            <p id="section-2.1-2.6.1">TODO the point in the network from which a conversation is observed and recorded<a href="#section-2.1-2.6.1" class="pilcrow">¶</a></p>
-</dd>
-        <dd class="break"></dd>
-</dl>
+<p id="section-2.1-2">Agent: As defined in <span>[<a href="#AUDIT-ARCH" class="cite xref">AUDIT-ARCH</a>]</span>, "a Workload whose behaviour is driven, in whole or in part, by a non-deterministic decision process (typically an LLM)".<a href="#section-2.1-2" class="pilcrow">¶</a></p>
+<p id="section-2.1-3">Tool: As defined in <span>[<a href="#AGENTIC-REQS" class="cite xref">AGENTIC-REQS</a>]</span>, "an external service invoked by an agent to retrieve data or perform operations. A tool is not necessarily an agent and may not participate in agent-to-agent communication."<a href="#section-2.1-3" class="pilcrow">¶</a></p>
+<p id="section-2.1-4">Observation Point: A point in the network from which a conversation, or part of it, is observed and recorded (see <a href="#fig-observation" class="auto internal xref">Figure 1</a>).<a href="#section-2.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1687,16 +1673,26 @@ TODO: the <span>[<a href="#VACR" class="cite xref">VACR</a>]</span> media type c
         <h3 id="name-permission-and-directive-ev">
 <a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-permission-and-directive-ev" class="section-name selfRef">Permission and Directive Events</a>
         </h3>
-<p id="section-5.5-1">Permission and directive requests occur within tool invocations (e.g. <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> elicitation), as well as directly in dialog with an AI agent.
+<p id="section-5.5-1">Permission and directive requests occur within tool invocations (e.g. <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> elicitation), as well as directly in dialog with an AI agent.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<p id="section-5.5-2">There are two distinct things to record.<a href="#section-5.5-2" class="pilcrow">¶</a></p>
+<p id="section-5.5-3">The first is a policy decision made by the agent or its host before acting (e.g. before invoking a tool).
+The outcome may be that no permission is needed, that permission is required or that the action is disallowed.
+No one is asked, so there is no conversation, only the decision and what it applies to.
+In some cases it is likely desirable to also capture the reason for the decision (e.g. why an action was disallowed).<a href="#section-5.5-3" class="pilcrow">¶</a></p>
+<p id="section-5.5-4">The second is a request for permission or input to the person or agent on whose behalf the agent is acting, and their response.
+This is part of the conversation.
+The response may be more than yes or no (e.g. allow once, allow for the Session, always allow or a choice from a menu).<a href="#section-5.5-4" class="pilcrow">¶</a></p>
+<p id="section-5.5-5">Only a decision that permission is required is followed by a request.
+The two are different and need distinct ways of being recorded in the vCon.
+<span>[<a href="#AAT" class="cite xref">AAT</a>]</span> and <span>[<a href="#AUDIT-ARCH" class="cite xref">AUDIT-ARCH</a>]</span> partially capture this distinction.
 Before a tool is invoked, the agent or its host decides by policy whether the tool may be used.
 The decision is one of no permission needed, permission required or tool use disallowed.
 The decision is part of the conversation record, even when no person or agent is asked.
 When permission is required, the request and the response are a separate conversation between the agent and the person or agent on whose behalf it is acting, not with the tool.
 The decision refers to the tool invocation it applies to (see <a href="#tool-invocation-events" class="auto internal xref">Section 5.4</a>).
-Recording the decision is in scope, making or enforcing it is not (see <a href="#out-of-scope" class="auto internal xref">Section 3.4</a>).<a href="#section-5.5-1" class="pilcrow">¶</a></p>
-<p id="section-5.5-2">TODO: more than yes/no, menus of options and other directive input requests.
-TODO: <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> elicitation (form and URL modes, accept, decline and cancel) as a model.
-TODO: <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> does not define a message for tool invocation approval, that is left to the host.<a href="#section-5.5-2" class="pilcrow">¶</a></p>
+Recording the decision is in scope, making or enforcing it is not (see <a href="#out-of-scope" class="auto internal xref">Section 3.4</a>).<a href="#section-5.5-5" class="pilcrow">¶</a></p>
+<p id="section-5.5-6">TODO: <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> elicitation (form and URL modes, accept, decline and cancel) as a model.
+TODO: <span>[<a href="#MCP" class="cite xref">MCP</a>]</span> does not define a message for tool invocation approval, that is left to the host.<a href="#section-5.5-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="agent-analysis-types">
@@ -1840,11 +1836,11 @@ TODO: different from Observer perspectives, but may need to support them.<a href
 <dl class="references">
 <dt id="AAT">[AAT]</dt>
         <dd>
-<span class="refAuthor">Sharif, R.</span>, <span class="refTitle">"Agent Audit Trail: A Standard Logging Format for Autonomous AI Systems"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-sharif-agent-audit-trail-08</span>, <time datetime="2026-10-13" class="refDate">13 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-sharif-agent-audit-trail-08">https://datatracker.ietf.org/doc/html/draft-sharif-agent-audit-trail-08</a>&gt;</span>. </dd>
+<span class="refAuthor">Sharif, R.</span>, <span class="refTitle">"Agent Audit Trail: A Standard Logging Format for Autonomous AI Systems"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-sharif-agent-audit-trail-09</span>, <time datetime="2026-10-26" class="refDate">26 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-sharif-agent-audit-trail-09">https://datatracker.ietf.org/doc/html/draft-sharif-agent-audit-trail-09</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="AGENTIC-REQS">[AGENTIC-REQS]</dt>
         <dd>
-<span class="refAuthor">Reddy.K, T.</span>, <span class="refAuthor">Sarker, Z.</span>, and <span class="refAuthor">K. Yao</span>, <span class="refTitle">"Agentic AI Use Cases and Requirements"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-agentic-ai-usecases-requirements-04</span>, <time datetime="2026-10-15" class="refDate">15 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-agentic-ai-usecases-requirements-04">https://datatracker.ietf.org/doc/html/draft-agentic-ai-usecases-requirements-04</a>&gt;</span>. </dd>
+<span class="refAuthor">Reddy.K, T.</span>, <span class="refAuthor">Sarker, Z.</span>, and <span class="refAuthor">K. Yao</span>, <span class="refTitle">"Agentic AI Use Cases and Requirements"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-agentic-ai-usecases-requirements-05</span>, <time datetime="2026-10-27" class="refDate">27 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-agentic-ai-usecases-requirements-05">https://datatracker.ietf.org/doc/html/draft-agentic-ai-usecases-requirements-05</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="AUDIT-ARCH">[AUDIT-ARCH]</dt>
         <dd>
