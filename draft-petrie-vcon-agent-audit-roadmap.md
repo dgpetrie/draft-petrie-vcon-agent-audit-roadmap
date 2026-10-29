@@ -130,14 +130,11 @@ This is the same as a contact center call, which may be observed by the carrier,
 
 See section 2.1 of [VCON-CORE] for terminology used in this document.
 
-Agent:
-: TODO borrow from [AGENTIC-REQS] or [AUDIT-ARCH]
+Agent: As defined in [AUDIT-ARCH], "a Workload whose behaviour is driven, in whole or in part, by a non-deterministic decision process (typically an LLM)".
 
-Tool:
-: TODO borrow from [AGENTIC-REQS]
+Tool: As defined in [AGENTIC-REQS], "an external service invoked by an agent to retrieve data or perform operations. A tool is not necessarily an agent and may not participate in agent-to-agent communication."
 
-Observation Point:
-: TODO the point in the network from which a conversation is observed and recorded
+Observation Point: A point in the network from which a conversation, or part of it, is observed and recorded (see [](#fig-observation)).
 
 # Requirements and Split
 
@@ -303,6 +300,21 @@ TODO: [MCP] based, the first example extension, see draft-petrie-vcon-tool-invoc
 ## Permission and Directive Events
 
 Permission and directive requests occur within tool invocations (e.g. [MCP] elicitation), as well as directly in dialog with an AI agent.
+
+There are two distinct things to record.
+
+The first is a policy decision made by the agent or its host before acting (e.g. before invoking a tool).
+The outcome may be that no permission is needed, that permission is required or that the action is disallowed.
+No one is asked, so there is no conversation, only the decision and what it applies to.
+In some cases it is likely desirable to also capture the reason for the decision (e.g. why an action was disallowed).
+
+The second is a request for permission or input to the person or agent on whose behalf the agent is acting, and their response.
+This is part of the conversation.
+The response may be more than yes or no (e.g. allow once, allow for the Session, always allow or a choice from a menu).
+
+Only a decision that permission is required is followed by a request.
+The two are different and need distinct ways of being recorded in the vCon.
+[AAT] and [AUDIT-ARCH] partially capture this distinction.
 Before a tool is invoked, the agent or its host decides by policy whether the tool may be used.
 The decision is one of no permission needed, permission required or tool use disallowed.
 The decision is part of the conversation record, even when no person or agent is asked.
@@ -310,7 +322,6 @@ When permission is required, the request and the response are a separate convers
 The decision refers to the tool invocation it applies to (see [](#tool-invocation-events)).
 Recording the decision is in scope, making or enforcing it is not (see [](#out-of-scope)).
 
-TODO: more than yes/no, menus of options and other directive input requests.
 TODO: [MCP] elicitation (form and URL modes, accept, decline and cancel) as a model.
 TODO: [MCP] does not define a message for tool invocation approval, that is left to the host.
 
