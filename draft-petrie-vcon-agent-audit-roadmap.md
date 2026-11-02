@@ -224,8 +224,7 @@ The gaps are filled by the strawman extensions in [](#strawman-vcon-extensions).
 
 * REQ-1, REQ-4 Event Logging and Type
   * Covered: Session start and duration, join and drop Events
-  * Gap: permission and directive requests and responses -> [](#permission-and-directive-events)
-
+  * Gap: policy decisions on whether an operation may be performed -> [](#tool-invocation-events)
 * REQ-3 Actor Identification
   * Covered: Party Object, including type "bot", uuid, did and validation
   * Gap: agent attributes such as model, provider, framework, version and workload identity -> [](#agent-party)
@@ -260,10 +259,10 @@ The gaps are filled by the strawman extensions in [](#strawman-vcon-extensions).
   * Gap: no standard media types for the data of common analysis (e.g. transcripts), making it hard to use one analysis as input to another -> [](#standard-analysis-media-types)
 
 The [AUDIT-ARCH] record types map onto the same gaps.
-Interaction Records are covered by Dialog and [](#permission-and-directive-events).
+Interaction Records are covered by Dialog and [](#permission-and-directive-events), and the policy decisions which precede them by [](#tool-invocation-events).
 The agent view of an Action Record is covered by [](#tool-invocation-events), the tool or service side by [](#observer).
 The structure of Delegation Records is covered by Session and Session_Reference.
-The conversation parts of Authorization Transition Records are covered by [](#permission-and-directive-events).
+The conversation parts of Authorization Transition Records are covered by [](#permission-and-directive-events), and the policy decisions by [](#tool-invocation-events).
 
 # Strawman vCon Extensions
 
@@ -295,32 +294,32 @@ TODO: revisit with more detail.
 
 ## Tool Invocation Events
 
-TODO: [MCP] based, the first example extension, see draft-petrie-vcon-tool-invocation.
+Defined in draft-petrie-vcon-tool-invocation, with [MCP] as the first protocol mapped:
+
+* Event Object types for each step of a tool invocation, from the request sent to the tool to its result, failure, protocol error, denial by the tool, timeout or cancellation, including pending operations, progress and requests for input from the tool
+* a policy-decision Event Object type, recording whether an operation is allowed, disallowed or requires permission, for one operation or standing
+* an operation_id which correlates the policy decision, the attempts of a tool invocation and, in future, permission requests and responses
+* the server and tool which identify a tool, without the tool definitions themselves (see [](#tool-definitions))
+
+Before an agent performs an operation (e.g. invoking a tool), the agent or its host makes a policy decision whether the operation may be performed.
+The outcome may be that no permission is needed, that permission is required or that the operation is disallowed.
+No one is asked, so there is no conversation, only the decision and what it applies to.
+In some cases it is likely desirable to also capture the reason for the decision (e.g. why the operation was disallowed).
+The policy decides whether the decision applies to one operation only or is standing.
+Recording the decision is in scope, making or enforcing it is not (see [](#out-of-scope)).
 
 ## Permission and Directive Events
 
 Permission and directive requests occur within tool invocations (e.g. [MCP] elicitation), as well as directly in dialog with an AI agent.
 
-There are two distinct things to record.
-
-The first is a policy decision made by the agent or its host before acting (e.g. before invoking a tool).
-The outcome may be that no permission is needed, that permission is required or that the action is disallowed.
-No one is asked, so there is no conversation, only the decision and what it applies to.
-In some cases it is likely desirable to also capture the reason for the decision (e.g. why an action was disallowed).
-
-The second is a request for permission or input to the person or agent on whose behalf the agent is acting, and their response.
+This covers a request for permission or input to the person or agent on whose behalf the agent is acting, and their response.
 This is part of the conversation.
 The response may be more than yes or no (e.g. allow once, allow for the Session, always allow or a choice from a menu).
 
+The request is distinct from the policy decision in [](#tool-invocation-events), and is recorded separately.
 Only a decision that permission is required is followed by a request.
-The two are different and need distinct ways of being recorded in the vCon.
 [AAT] and [AUDIT-ARCH] partially capture this distinction.
-Before a tool is invoked, the agent or its host decides by policy whether the tool may be used.
-The decision is one of no permission needed, permission required or tool use disallowed.
-The decision is part of the conversation record, even when no person or agent is asked.
-When permission is required, the request and the response are a separate conversation between the agent and the person or agent on whose behalf it is acting, not with the tool.
-The decision refers to the tool invocation it applies to (see [](#tool-invocation-events)).
-Recording the decision is in scope, making or enforcing it is not (see [](#out-of-scope)).
+The requirements identified so far are outlined in draft-petrie-vcon-tool-invocation, including requests passed along a chain of agents, requests which end without an answer, directives no one asked for, answers given out of band and more than one approver.
 
 TODO: [MCP] elicitation (form and URL modes, accept, decline and cancel) as a model.
 TODO: [MCP] does not define a message for tool invocation approval, that is left to the host.
@@ -361,6 +360,7 @@ TODO: AUDIT trace ID, parent ID and delegation chain.
 * TODO: Observer as an extension or later in core
 * TODO: overlap between Agent Analysis Types and Standard Analysis Media Types
 * TODO: linking, merging and de-duplicating vCons of the same conversation from different observation points, and handling conflicts
+* TODO: policy decisions for operations other than tool invocations, and whether operation names need a registry
 
 # Security Considerations
 
