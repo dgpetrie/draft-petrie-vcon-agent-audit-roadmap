@@ -224,7 +224,9 @@ The gaps are filled by the strawman extensions in [](#strawman-vcon-extensions).
 
 * REQ-1, REQ-4 Event Logging and Type
   * Covered: Session start and duration, join and drop Events
+  * Gap: permission and directive requests and responses -> [](#permission-and-directive-events)
   * Gap: policy decisions on whether an operation may be performed -> [](#tool-invocation-events)
+
 * REQ-3 Actor Identification
   * Covered: Party Object, including type "bot", uuid, did and validation
   * Gap: agent attributes such as model, provider, framework, version and workload identity -> [](#agent-party)
