@@ -4,8 +4,8 @@
 
 Virtualized Conversations                                    D. G Petrie
 Internet-Draft                                                 SIPez LLC
-Intended status: Informational                           29 October 2026
-Expires: 2 May 2027
+Intended status: Informational                           2 November 2026
+Expires: 6 May 2027
 
 
    vCon for AI Agent Conversations: Requirements, Gaps and Extension
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 May 2027.
+   This Internet-Draft will expire on 6 May 2027.
 
 Copyright Notice
 
@@ -310,8 +310,8 @@ Table of Contents
 
       -  Covered: Session start and duration, join and drop Events
 
-      -  Gap: permission and directive requests and responses ->
-         Section 5.5
+      -  Gap: policy decisions on whether an operation may be performed
+         -> Section 5.4
 
    *  REQ-3 Actor Identification
 
@@ -383,11 +383,13 @@ Table of Contents
          to another -> Section 5.8
 
    The [AUDIT-ARCH] record types map onto the same gaps.  Interaction
-   Records are covered by Dialog and Section 5.5.  The agent view of an
+   Records are covered by Dialog and Section 5.5, and the policy
+   decisions which precede them by Section 5.4.  The agent view of an
    Action Record is covered by Section 5.4, the tool or service side by
    Section 5.9.  The structure of Delegation Records is covered by
    Session and Session_Reference.  The conversation parts of
-   Authorization Transition Records are covered by Section 5.5.
+   Authorization Transition Records are covered by Section 5.5, and the
+   policy decisions by Section 5.4.
 
 5.  Strawman vCon Extensions
 
@@ -427,43 +429,54 @@ Table of Contents
 
 5.4.  Tool Invocation Events
 
-   TODO: [MCP] based, the first example extension, see draft-petrie-
-   vcon-tool-invocation.
+   Defined in draft-petrie-vcon-tool-invocation, with [MCP] as the first
+   protocol mapped:
+
+   *  Event Object types for each step of a tool invocation, from the
+      request sent to the tool to its result, failure, protocol error,
+      denial by the tool, timeout or cancellation, including pending
+      operations, progress and requests for input from the tool
+
+   *  a policy-decision Event Object type, recording whether an
+      operation is allowed, disallowed or requires permission, for one
+      operation or standing
+
+   *  an operation_id which correlates the policy decision, the attempts
+      of a tool invocation and, in future, permission requests and
+      responses
+
+   *  the server and tool which identify a tool, without the tool
+      definitions themselves (see Section 5.3)
+
+   Before an agent performs an operation (e.g. invoking a tool), the
+   agent or its host makes a policy decision whether the operation may
+   be performed.  The outcome may be that no permission is needed, that
+   permission is required or that the operation is disallowed.  No one
+   is asked, so there is no conversation, only the decision and what it
+   applies to.  In some cases it is likely desirable to also capture the
+   reason for the decision (e.g. why the operation was disallowed).  The
+   policy decides whether the decision applies to one operation only or
+   is standing.  Recording the decision is in scope, making or enforcing
+   it is not (see Section 3.4).
 
 5.5.  Permission and Directive Events
 
    Permission and directive requests occur within tool invocations (e.g.
    [MCP] elicitation), as well as directly in dialog with an AI agent.
 
-   There are two distinct things to record.
-
-   The first is a policy decision made by the agent or its host before
-   acting (e.g. before invoking a tool).  The outcome may be that no
-   permission is needed, that permission is required or that the action
-   is disallowed.  No one is asked, so there is no conversation, only
-   the decision and what it applies to.  In some cases it is likely
-   desirable to also capture the reason for the decision (e.g. why an
-   action was disallowed).
-
-   The second is a request for permission or input to the person or
-   agent on whose behalf the agent is acting, and their response.  This
-   is part of the conversation.  The response may be more than yes or no
+   This covers a request for permission or input to the person or agent
+   on whose behalf the agent is acting, and their response.  This is
+   part of the conversation.  The response may be more than yes or no
    (e.g. allow once, allow for the Session, always allow or a choice
    from a menu).
 
-   Only a decision that permission is required is followed by a request.
-   The two are different and need distinct ways of being recorded in the
-   vCon.  [AAT] and [AUDIT-ARCH] partially capture this distinction.
-   Before a tool is invoked, the agent or its host decides by policy
-   whether the tool may be used.  The decision is one of no permission
-   needed, permission required or tool use disallowed.  The decision is
-   part of the conversation record, even when no person or agent is
-   asked.  When permission is required, the request and the response are
-   a separate conversation between the agent and the person or agent on
-   whose behalf it is acting, not with the tool.  The decision refers to
-   the tool invocation it applies to (see Section 5.4).  Recording the
-   decision is in scope, making or enforcing it is not (see
-   Section 3.4).
+   The request is distinct from the policy decision in Section 5.4, and
+   is recorded separately.  Only a decision that permission is required
+   is followed by a request.  [AAT] and [AUDIT-ARCH] partially capture
+   this distinction.  The requirements identified so far are outlined in
+   draft-petrie-vcon-tool-invocation, including requests passed along a
+   chain of agents, requests which end without an answer, directives no
+   one asked for, answers given out of band and more than one approver.
 
    TODO: [MCP] elicitation (form and URL modes, accept, decline and
    cancel) as a model.  TODO: [MCP] does not define a message for tool
@@ -519,6 +532,9 @@ Table of Contents
       conversation from different observation points, and handling
       conflicts
 
+   *  TODO: policy decisions for operations other than tool invocations,
+      and whether operation names need a registry
+
 7.  Security Considerations
 
    *  TODO
@@ -555,9 +571,9 @@ Table of Contents
    [AGENTIC-REQS]
               Reddy.K, T., Sarker, Z., and K. Yao, "Agentic AI Use Cases
               and Requirements", Work in Progress, Internet-Draft,
-              draft-agentic-ai-usecases-requirements-05, 27 October
+              draft-agentic-ai-usecases-requirements-07, 2 November
               2026, <https://datatracker.ietf.org/doc/html/draft-
-              agentic-ai-usecases-requirements-05>.
+              agentic-ai-usecases-requirements-07>.
 
    [AUDIT-ARCH]
               Kühlewind, M. and H. Birkholz, "An Architecture for
@@ -614,9 +630,9 @@ Table of Contents
    [VCON-CORE]
               Petrie, D., "The JSON format for vCon - Conversation Data
               Container", Work in Progress, Internet-Draft, draft-ietf-
-              vcon-vcon-core-04, 7 September 2026,
+              vcon-vcon-core-05, 31 October 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-vcon-
-              vcon-core-04>.
+              vcon-core-05>.
 
 Acknowledgments
 
