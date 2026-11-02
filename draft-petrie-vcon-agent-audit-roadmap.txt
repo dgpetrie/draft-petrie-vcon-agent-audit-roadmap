@@ -310,6 +310,9 @@ Table of Contents
 
       -  Covered: Session start and duration, join and drop Events
 
+      -  Gap: permission and directive requests and responses ->
+         Section 5.5
+
       -  Gap: policy decisions on whether an operation may be performed
          -> Section 5.4
 
